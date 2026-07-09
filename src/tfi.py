@@ -29,10 +29,9 @@ def repeat(fiConf, **kwargs):
 	rep_sz = math.floor(rep_sz)
 	sz = num - rep_sz
 	ind = random.sample(range(num), sz)
-	x_test_, y_test_ = tf.gather(x_test, ind), tf.gather(y_test, ind)
 	upd = random.sample(ind, rep_sz)
 	x_, y_ = tf.gather(x_test, upd), tf.gather(y_test, upd)
-	x_test_, y_test_ = tf.concat([x_test_, x_], 0), tf.concat([y_test_, y_], 0)
+	x_test_, y_test_ = tf.concat([x_test, x_], 0), tf.concat([y_test, y_], 0)
 	return (x_test_, y_test_)
 
 def remove(fiConf, **kwargs):
@@ -45,6 +44,7 @@ def remove(fiConf, **kwargs):
 	sz = num - rem_sz
 	ind = random.sample(range(num), sz)
 	x_test_, y_test_ = tf.gather(x_test, ind), tf.gather(y_test, ind)
+	x_test_ = tf.convert_to_tensor(x_test_)
 	return (x_test_, y_test_)
 
 def noise_add(fiConf, **kwargs):
@@ -124,9 +124,10 @@ def label_err(fiConf, **kwargs):
 	ind = random.sample(range(num), err_sz)
 	_, check = str(y_test.shape).split(",")
 	if(check==')'):
-            y_test = y_test.reshape(num, 1)
+		y_test = y_test.reshape(num, 1)
 	for item in ind:
-		r = list(range(0, y_test[item][0])) + list(range(y_test[item][0] + 1, 10))
+		maxval = np.amax(y_test)
+		r = list(range(0, y_test[item][0])) + list(range(y_test[item][0] + 1, maxval+1))
 		y_test[item] = random.choice(r)
 	return y_test
 
